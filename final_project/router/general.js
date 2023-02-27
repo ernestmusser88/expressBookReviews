@@ -1,6 +1,7 @@
 const express = require('express');
 let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
+let doesExist = require("./auth_users.js").doesExist;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
@@ -9,24 +10,16 @@ public_users.post("/register", (req,res) => {
 //Write your code here
   let username = req.query.username;
   let password = req.query.password;
+  
 
-  if(isValid(username) == false || username.length == 0){
-    return res.status(406).json({message: "Invalid Username"});
+  if(!isValid(username) || !username){
+    return res.status(404).json({message: "Invalid Username"});
   }
-  for(let i = 1; i <= Object.keys(users).length; i++){
-    if(users[i].username == username){
-      return res.status(406).json({message: "Username already exists"});   
-    }
-  }
-  if(password.length == 0){
-    return res.status(406).json({message: "Please provide a password"});
-  }
-  else{
-      
-    let newKey = Object.keys(users).length+1;
-    users[newKey] = {"username":username,"password":password};
-    console.log(users);
-    return res.status(200).json({message: `Welcome ${username}!`});
+  if (!doesExist(username) && password) { 
+      users.push({"username":username,"password":password});
+      return res.status(200).json({message: "User successfully registred. Now you can login"});
+    } else {
+      return res.status(404).json({message: "User already exists!"});    
   }
 });
 
@@ -79,6 +72,13 @@ public_users.get('/review/:isbn',function (req, res) {
 
   return res.send(JSON.stringify(reviews));
 
+});
+
+//for testing
+public_users.get('/users',function (req, res) {
+    //Write your code here
+    const user = users;
+    return res.send(JSON.stringify({user}));
 });
 
 module.exports.general = public_users;
