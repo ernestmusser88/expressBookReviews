@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require("axios");
 let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let doesExist = require("./auth_users.js").doesExist;
@@ -24,16 +25,16 @@ public_users.post("/register", (req,res) => {
 });
 
 // Get the book list available in the shop 1-getallbooks.png
-public_users.get('/',function (req, res) {
+public_users.get('/',async function (req, res) {
   //Write your code here
   res.send(JSON.stringify(books,null,4));
 });
 
 // Get book details based on ISBN 2-gedetailsISBN.png
-public_users.get('/isbn/:isbn',function (req, res) {
+public_users.get('/isbn/:isbn',async function (req, res) {
     //Write your code here
     const isbn = books[req.params.isbn];
-    return res.send(JSON.stringify({isbn}));
+    return (res.send(JSON.stringify({isbn})));
 });
   
 // Get book details based on author

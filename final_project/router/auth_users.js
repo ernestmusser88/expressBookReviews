@@ -17,7 +17,7 @@ const doesExist = (username)=>{
 }
 
 const isValid = (username)=>{ //returns boolean
-//write code to check is the username is valid
+    //write code to check is the username is valid
     let spaces = new RegExp("\\s", "g") //Check for blank spaces
     let goodchars = new RegExp("[^a-zA-Z0-9_]","g") //Check for illegal characters
 
@@ -44,6 +44,7 @@ const authenticatedUser = (username,password)=>{ //returns boolean
 
 //only registered users can login
 regd_users.post("/login", (req,res) => {
+
     const username = req.query.username;
     const password = req.query.password;
     
@@ -54,7 +55,7 @@ regd_users.post("/login", (req,res) => {
     if (authenticatedUser(username,password)) {
       let accessToken = jwt.sign({
         data: password
-      }, 'access', { expiresIn: 60 });
+      }, 'access', { expiresIn: 60 * 60 });
   
       req.session.authorization = {
         accessToken,username
@@ -67,12 +68,34 @@ regd_users.post("/login", (req,res) => {
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+    //Write your code here
+    const username = req.query.username;
+    const review = req.query.review;
+    const book = books[req.params.isbn];
+
+    if(book){
+        book.reviews[username] = review;
+        return res.status(200).json(book);
+    }
+
+  return res.status(404).json({message: "Not Found"});
+});
+// Delete a review
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    const username = req.query.username;
+    const review = req.query.review;
+    const book = books[req.params.isbn];
+
+    if(book){
+        delete book.reviews[username];
+        return res.status(200).json(book);
+    }
+
+  return res.status(404).json({message: "Not Found"});
+
 });
 
 module.exports.authenticated = regd_users;
-module.exports.authenticated = authenticatedUser;
 module.exports.isValid = isValid;
 module.exports.doesExist = doesExist;
 module.exports.users = users;
