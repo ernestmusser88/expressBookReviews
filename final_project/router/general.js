@@ -27,20 +27,21 @@ public_users.post("/register", (req,res) => {
 // Get the book list available in the shop 1-getallbooks.png
 public_users.get('/',async function (req, res) {
   //Write your code here
-  res.send(JSON.stringify(books,null,4));
+  const booklist = await books;
+  res.send(JSON.stringify(booklist, null, 4));
 });
 
 // Get book details based on ISBN 2-gedetailsISBN.png
 public_users.get('/isbn/:isbn',async function (req, res) {
     //Write your code here
-    const isbn = books[req.params.isbn];
+    const isbn = await books[req.params.isbn];
     return (res.send(JSON.stringify({isbn})));
 });
   
 // Get book details based on author
-public_users.get('/author/:author',function (req, res) {
+public_users.get('/author/:author',async function (req, res) {
     //Write your code here
-    const author = req.params.author;
+    const author = await req.params.author;
     let booklist = [];
     for(let i = 1; i <= Object.keys(books).length; i++){
         if(books[i].author === author){
@@ -52,9 +53,9 @@ public_users.get('/author/:author',function (req, res) {
 });
 
 // Get all books based on title
-public_users.get('/title/:title',function (req, res) {
+public_users.get('/title/:title',async function (req, res) {
   //Write your code here
-  const title = req.params.title;
+  const title = await req.params.title;
   let booklist = [];
   for(let i = 1; i <= Object.keys(books).length; i++){
       if(books[i].title === title){
